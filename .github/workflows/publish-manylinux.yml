@@ -7,8 +7,14 @@ on:
 
 jobs:
   build-and-push-docker-image:
-    name: Build Docker image and push to repositories
+    name: Building manylinux:py${{ matrix.python }}-cu${{ matrix.cuda }}
     runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        cuda: [10.2, 11.3]
+        python: [3.6, 3.7, 3.8]
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -23,11 +29,14 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       
-      - name: Build image and push to Docker Hub and GitHub Container Registry
+      - name: Build image and push to Docker Hub
         uses: docker/build-push-action@v2
         with:
+          build-args: |
+            PYTHON_VERSION=${{ matrix.python }}
+            CUDA_VERSION=${{ matrix.cuda }}
           context: ./manylinux
-          tags: torchextentionbuilder/manylinux:latest 
+          tags: torchextentionbuilder/manylinux:py${{ matrix.python }}-cu${{ matrix.cuda }}
           push: ${{ github.ref == 'refs/heads/main' }}
 
       - name: Image digest
