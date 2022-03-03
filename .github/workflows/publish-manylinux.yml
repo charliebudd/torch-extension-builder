@@ -1,10 +1,5 @@
 name: Publish Docker Images
 
-on:
-  push:
-    branches: [main]
-  pull_request:
-
 jobs:
   build-and-push-docker-image:
     name: Building manylinux:py${{ matrix.python }}-cu${{ matrix.cuda }}
