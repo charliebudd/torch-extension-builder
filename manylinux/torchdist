@@ -1,0 +1,73 @@
+#!/bin/bash
+
+# This script patches the built .so to link to the libraries 
+# included with torch rather than bundle it's own instances of 
+# these libraries. This prevents collisions between the two 
+# libraries while also vastly reducing the size of the wheel
+
+WHEELS=$@
+
+OUT_DIR='torchdist'
+TEMP_DIR='tempwheel'
+TORCH_LIBS=`ls $TORCH_LIBRARY_PATH`
+mkdir $OUT_DIR
+
+for WHEEL in $WHEELS; do
+    echo "Patching $WHEEL..."
+
+    WHEEL_NAME=`echo $WHEEL | rev | cut -d '/' -f1 | rev`
+    unzip $WHEEL -d $TEMP_DIR
+
+    DIST_INFO_DIR=$(ls $TEMP_DIR/*.dist-info -d)
+
+    # =================================
+    # Stripping redundant packages and relinking to torch provided versions 
+    PACKAGE_LIBS=`ls $TEMP_DIR/*.so`
+    WHEEL_LIB_DIR=`ls -d $TEMP_DIR/*.libs`
+    PACKAGE_NAME=`echo $WHEEL_LIB_DIR | cut -d '/' -f2`
+    WHEEL_LIBS=`ls $TEMP_DIR/*.libs/`
+
+    for WHEEL_LIB in $WHEEL_LIBS; do
+        WHEEL_LIB_NAME=`echo $WHEEL_LIB | cut -d '-' -f1`
+        WHEEL_LIB_VERSION=`echo $WHEEL_LIB | cut -d '.' -f2-`
+        for TORCH_LIB in $TORCH_LIBS; do
+            if [[ $TORCH_LIB =~ $WHEEL_LIB_NAME[-.].*$WHEEL_LIB_VERSION ]]; then
+                for PACKAGE_LIB in $PACKAGE_LIBS; do
+                    patchelf --remove-needed $WHEEL_LIB $PACKAGE_LIB
+                    patchelf --add-needed $TORCH_LIB $PACKAGE_LIB
+                    rm $WHEEL_LIB_DIR/$WHEEL_LIB
+                    sed -i -e "/$WHEEL_LIB_DIR\/$WHEEL_LIB/d" $DIST_INFO_DIR/RECORD
+                done
+            fi
+        done
+    done
+
+    # =================================
+    # Updating rpath to include relative torch lib directory
+    for PACKAGE_LIB in $PACKAGE_LIBS; do
+        patchelf --set-rpath \$ORIGIN/../torch/libs:\$ORIGIN/$PACKAGE_NAME $PACKAGE_LIB
+    done
+
+    # =================================
+    # Tagging wheel
+
+    VERSION_TAG=$(echo $DIST_INFO_DIR | cut -d '/' -f2 | rev | cut -d '.' -f2- | rev | cut -d '-' -f2)
+    CUDA_TAG=$(readlink /usr/local/cuda | cut -d '-' -f2 | cut -d '/' -f1 | sed 's/\.//')
+    NEW_VERSION_TAG=$VERSION_TAG+cu$CUDA_TAG
+
+    NEW_DIST_INFO_DIR="${DIST_INFO_DIR/$VERSION_TAG/$NEW_VERSION_TAG}"
+    mv $DIST_INFO_DIR $NEW_DIST_INFO_DIR
+    sed -i -e "s/Version: $VERSION_TAG/Version: $NEW_VERSION_TAG/g" $NEW_DIST_INFO_DIR/METADATA
+    sed -i -e "s/$VERSION_TAG.dist-info/$NEW_VERSION_TAG.dist-info/g" $NEW_DIST_INFO_DIR/RECORD
+
+    # =================================
+    # Zipping patched wheel
+    NEW_WHEEL_NAME="${WHEEL_NAME/-$VERSION_TAG-/-$NEW_VERSION_TAG-}"
+    cd $TEMP_DIR
+    zip ../$OUT_DIR/$WHEEL_NAME * -r
+    cd ..
+    rm $TEMP_DIR -r
+    
+    echo "Patched wheel saved at $OUT_DIR/$WHEEL_NAME."
+
+done

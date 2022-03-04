@@ -1,6 +1,0 @@
-name: Build Manylinux
-description: Builds package into manylinux wheels
-runs:
-  using: docker
-  image: docker://torchextentionbuilder:manylinux:py{{ $inputs.python }}-cu{{ $inputs.cuda }}
-  entrypoint: {{ $inputs.entrypoint }}

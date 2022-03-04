@@ -1,14 +1,26 @@
 name: Publish Docker Images
 
+on:
+  push:
+    branches: [main]
+  pull_request:
+
 jobs:
   build-and-push-docker-image:
-    name: Building manylinux:py${{ matrix.python }}-cu${{ matrix.cuda }}
+    name: Building manylinux:py${{ matrix.python-version }}-cu${{ matrix.cuda-version }}
     runs-on: ubuntu-latest
     
     strategy:
       matrix:
-        cuda: [10.2, 11.3]
-        python: [3.6, 3.7, 3.8]
+        cuda-version: [10.2, 11.3]
+        python-version: [3.6, 3.7, 3.8]
+        include:
+          - cuda-version: 10.2
+            cuda-arch-list: "6.0 6.1 6.2 7.0 7.2 7.5+PTX"
+            gcc-version: 8
+          - cuda-version: 11.3
+            cuda-arch-list: "6.0 6.1 6.2 7.0 7.2 7.5 8.0 8.6+PTX"
+            gcc-version: 10
 
     steps:
       - name: Checkout code
@@ -28,10 +40,12 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           build-args: |
-            PYTHON_VERSION=${{ matrix.python }}
-            CUDA_VERSION=${{ matrix.cuda }}
+            PYTHON_VERSION=${{ matrix.python-version }}
+            CUDA_VERSION=${{ matrix.cuda-version }}
+            CUDA_ARCH_LIST=${{ matrix.cuda-arch-list }}
+            GCC_VERSION=${{ matrix.gcc-version }}
           context: ./manylinux
-          tags: torchextentionbuilder/manylinux:py${{ matrix.python }}-cu${{ matrix.cuda }}
+          tags: torchextentionbuilder/manylinux:py${{ matrix.python-version }}-cu${{ matrix.cuda-version }}
           push: ${{ github.ref == 'refs/heads/main' }}
 
       - name: Image digest
