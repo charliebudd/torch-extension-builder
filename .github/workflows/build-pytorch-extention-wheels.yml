@@ -1,0 +1,63 @@
+name: Build PyTorch Extention Wheels
+
+on:
+  workflow_call:
+    inputs:
+      python-versions:
+        type: string
+        default: "[3.6, 3.7, 3.8]"
+      cuda-versions:
+        type: string
+        default: "[10.2, 11.3]"
+
+jobs:
+  build-all-wheels:
+    name: Build All Wheels
+    runs-on: ubuntu-latest
+    container: docker://torchextentionbuilder/manylinux:py${{ matrix.python }}-cu${{ matrix.cuda }}
+    strategy:
+      fail-fast: false
+      matrix:
+        cuda: ${{ fromJson(inputs.cuda-versions) }}
+        python: ${{ fromJson(inputs.python-versions) }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Test
+        run: sh test.sh
+
+      - name: Build Wheel
+        run: python setup.py bdist_wheel
+        
+      - name: Repair Wheel
+        run: auditwheel repair dist/*.whl --plat manylinux_2_17_x86_64 --only-plat
+        
+      - name: Patch Wheel
+        run: torchdist wheelhouse/*manylinux*.whl
+
+      - name: Cache Wheels
+        uses: actions/upload-artifact@v3
+        with:
+          path: torchdist
+          name: built-wheels
+          retention-days: 1
+  
+  # # build-all-wheels:
+  #  # name: Build All Wheels
+  # Aggregate Cuda Wheels:
+  #   runs-on: ubuntu-latest
+  #   needs: Build All Wheels
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       python: ${{ inputs.python-versions }}
+
+  #   steps:
+  #     - name: Download Cached Wheels
+  #       uses: actions/download-artifact@v3
+  #       with:
+  #         name: ${{ matrix.python }}-wheels
+
+  #     - name: Aggregate Cuda Wheels
+  #       uses: actions/download-artifact@v3

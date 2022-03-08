@@ -51,14 +51,14 @@ for WHEEL in $WHEELS; do
     # =================================
     # Tagging wheel
 
-    VERSION_TAG=$(echo $DIST_INFO_DIR | cut -d '/' -f2 | rev | cut -d '.' -f2- | rev | cut -d '-' -f2)
-    CUDA_TAG=$(readlink /usr/local/cuda | cut -d '-' -f2 | cut -d '/' -f1 | sed 's/\.//')
-    NEW_VERSION_TAG=$VERSION_TAG+cu$CUDA_TAG
+    # VERSION_TAG=$(echo $DIST_INFO_DIR | cut -d '/' -f2 | rev | cut -d '.' -f2- | rev | cut -d '-' -f2)
+    # CUDA_TAG=$(readlink /usr/local/cuda | cut -d '-' -f2 | cut -d '/' -f1 | sed 's/\.//')
+    # NEW_VERSION_TAG=$VERSION_TAG+cu$CUDA_TAG
 
-    NEW_DIST_INFO_DIR="${DIST_INFO_DIR/$VERSION_TAG/$NEW_VERSION_TAG}"
-    mv $DIST_INFO_DIR $NEW_DIST_INFO_DIR
-    sed -i -e "s/Version: $VERSION_TAG/Version: $NEW_VERSION_TAG/g" $NEW_DIST_INFO_DIR/METADATA
-    sed -i -e "s/$VERSION_TAG.dist-info/$NEW_VERSION_TAG.dist-info/g" $NEW_DIST_INFO_DIR/RECORD
+    # NEW_DIST_INFO_DIR="${DIST_INFO_DIR/$VERSION_TAG/$NEW_VERSION_TAG}"
+    # mv $DIST_INFO_DIR $NEW_DIST_INFO_DIR
+    # sed -i -e "s/Version: $VERSION_TAG/Version: $NEW_VERSION_TAG/g" $NEW_DIST_INFO_DIR/METADATA
+    # sed -i -e "s/$VERSION_TAG.dist-info/$NEW_VERSION_TAG.dist-info/g" $NEW_DIST_INFO_DIR/RECORD
 
     # =================================
     # Zipping patched wheel
