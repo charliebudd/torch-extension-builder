@@ -7,7 +7,7 @@
 
 WHEELS=$@
 
-OUT_DIR='torchdist'
+OUT_DIR='patched_wheels'
 TEMP_DIR='tempwheel'
 TORCH_LIBS=`ls $TORCH_LIBRARY_PATH`
 mkdir $OUT_DIR
@@ -36,7 +36,7 @@ for WHEEL in $WHEELS; do
                     patchelf --remove-needed $WHEEL_LIB $PACKAGE_LIB
                     patchelf --add-needed $TORCH_LIB $PACKAGE_LIB
                     rm $WHEEL_LIB_DIR/$WHEEL_LIB
-                    sed -i -e "/$WHEEL_LIB_DIR\/$WHEEL_LIB/d" $DIST_INFO_DIR/RECORD
+                    sed -i -e "/$WHEEL_LIB/d" $DIST_INFO_DIR/RECORD
                 done
             fi
         done
@@ -45,29 +45,17 @@ for WHEEL in $WHEELS; do
     # =================================
     # Updating rpath to include relative torch lib directory
     for PACKAGE_LIB in $PACKAGE_LIBS; do
-        patchelf --set-rpath \$ORIGIN/../torch/libs:\$ORIGIN/$PACKAGE_NAME $PACKAGE_LIB
+        patchelf --set-rpath \$ORIGIN/../torch/lib:\$ORIGIN/$PACKAGE_NAME.libs $PACKAGE_LIB
     done
 
     # =================================
-    # Tagging wheel
-
-    # VERSION_TAG=$(echo $DIST_INFO_DIR | cut -d '/' -f2 | rev | cut -d '.' -f2- | rev | cut -d '-' -f2)
-    # CUDA_TAG=$(readlink /usr/local/cuda | cut -d '-' -f2 | cut -d '/' -f1 | sed 's/\.//')
-    # NEW_VERSION_TAG=$VERSION_TAG+cu$CUDA_TAG
-
-    # NEW_DIST_INFO_DIR="${DIST_INFO_DIR/$VERSION_TAG/$NEW_VERSION_TAG}"
-    # mv $DIST_INFO_DIR $NEW_DIST_INFO_DIR
-    # sed -i -e "s/Version: $VERSION_TAG/Version: $NEW_VERSION_TAG/g" $NEW_DIST_INFO_DIR/METADATA
-    # sed -i -e "s/$VERSION_TAG.dist-info/$NEW_VERSION_TAG.dist-info/g" $NEW_DIST_INFO_DIR/RECORD
-
-    # =================================
     # Zipping patched wheel
-    NEW_WHEEL_NAME="${WHEEL_NAME/-$VERSION_TAG-/-$NEW_VERSION_TAG-}"
+    NEW_WHEEL_NAME="${WHEEL_NAME}.pt${PYTORCH_VERSION//.}cu${CUDA_VERSION//.}"
     cd $TEMP_DIR
-    zip ../$OUT_DIR/$WHEEL_NAME * -r
+    zip ../$OUT_DIR/$NEW_WHEEL_NAME * -r
     cd ..
     rm $TEMP_DIR -r
     
-    echo "Patched wheel saved at $OUT_DIR/$WHEEL_NAME."
+    echo "Patched wheel saved at $OUT_DIR/$NEW_WHEEL_NAME."
 
 done

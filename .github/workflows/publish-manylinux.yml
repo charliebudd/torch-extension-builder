@@ -3,9 +3,6 @@ name: Publish Docker Images
 on:
   push:
     branches: [main]
-    paths: [manylinux]
-  pull_request:
-    paths: [manylinux]
 
 jobs:
   build-and-push-docker-image:
@@ -15,7 +12,7 @@ jobs:
     strategy:
       matrix:
         python-version: [3.6, 3.7, 3.8]
-        pytorch-version: [1.9, 1.10]
+        pytorch-version: [1.9, '1.10']
         cuda-version: [10.2, 11.3]
         include:
           - cuda-version: 10.2
@@ -51,6 +48,3 @@ jobs:
           context: ./manylinux
           tags: torchextentionbuilder/manylinux:py${{ matrix.python-version }}-pt${{ matrix.pytorch-version }}-cu${{ matrix.cuda-version }}
           push: ${{ github.ref == 'refs/heads/main' }}
-
-      - name: Image digest
-        run: echo ${{ steps.docker_build.outputs.digest }}

@@ -17,9 +17,10 @@
 FROM quay.io/pypa/manylinux2014_x86_64
 
 #===================================
-# Python and cuda version arguments, expected 
+# Python, PyTorch, and CUDA version arguments, expected 
 # in the form <major>.<minor>...
 ARG PYTHON_VERSION
+ARG PYTORCH_VERSION
 ARG CUDA_VERSION
 
 #===================================
@@ -36,32 +37,35 @@ ARG GCC_VERSION
 # Installing required cuda version...
 RUN yum-config-manager --add-repo https://developer.download.nvidia.com/compute/cuda/repos/rhel7/x86_64/cuda-rhel7.repo; \
     yum clean all; \
-    yum --enablerepo=epel -y install cuda-${CUDA_VERSION//./-};
+    yum --enablerepo=epel -y install cuda-${CUDA_VERSION//./-}; \
+    yes | rm /opt/nvidia/nsight-* /usr/local/cuda/samples /usr/local/cuda/libnvvp /usr/local/cuda/nsightee_plugins -r; \
+    yum clean all;
 
 #===================================
 # Setting up correct gcc version for nvcc...
-RUN yum -y install devtoolset-${GCC_VERSION}-toolchain; \
+RUN yum -y install zip devtoolset-${GCC_VERSION}-toolchain; \
     ln -sf /opt/rh/devtoolset-${GCC_VERSION}/root/usr/bin/gcc /usr/local/cuda/bin/gcc; \
-    ln -sf /opt/rh/devtoolset-${GCC_VERSION}/root/usr/bin/g++ /usr/local/cuda/bin/g++;
+    ln -sf /opt/rh/devtoolset-${GCC_VERSION}/root/usr/bin/g++ /usr/local/cuda/bin/g++; \
+    yum clean all;
 
 #===================================
 # Setting up python environment...
 RUN ln -sf python${PYTHON_VERSION} /usr/local/bin/python; \
     ln -sf $(ls /opt/_internal/cpython-${PYTHON_VERSION}.* -d) /opt/_internal/cpython-${PYTHON_VERSION}; \
-    python -m pip install setuptools ninja numpy wheel; \
-    python -m pip install torch==1.10.2+cu${CUDA_VERSION//.} -f https://download.pytorch.org/whl/cu${CUDA_VERSION//.}/torch_stable.html;
+    python -m pip --no-cache-dir install setuptools ninja numpy wheel; \
+    python -m pip --no-cache-dir install torch~=${PYTORCH_VERSION} -f https://download.pytorch.org/whl/cu${CUDA_VERSION//.}/torch_stable.html;
 
 #===================================
 # Setting environment variables...
+ENV PYTHON_VERSION "${PYTHON_VERSION}"
+ENV PYTORCH_VERSION "${PYTORCH_VERSION}"
+ENV CUDA_VERSION "${CUDA_VERSION}"
 ENV TORCH_CUDA_ARCH_LIST "${CUDA_ARCH_LIST}"
 ENV TORCH_LIBRARY_PATH "/opt/_internal/cpython-${PYTHON_VERSION}/lib/python${PYTHON_VERSION}/site-packages/torch/lib"
 ENV LD_LIBRARY_PATH "${TORCH_LIBRARY_PATH}:$LD_LIBRARY_PATH"
 
 #===================================
-# Adding torchdist bash script to patch wheels...
-COPY torchdist /usr/bin
-RUN chmod +x /usr/bin/torchdist
-
-#===================================
-# Zip required for re-zipping patched wheels..
-RUN yum -y install zip
+# Adding scripts...
+COPY combine_wheels.py /usr/bin
+COPY patch_wheels /usr/bin
+RUN chmod +x /usr/bin/patch_wheels

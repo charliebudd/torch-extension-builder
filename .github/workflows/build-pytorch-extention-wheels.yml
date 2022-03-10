@@ -6,58 +6,78 @@ on:
       python-versions:
         type: string
         default: "[3.6, 3.7, 3.8]"
+      pytorch-versions:
+        type: string
+        default: "[1.9, '1.10']"
       cuda-versions:
         type: string
         default: "[10.2, 11.3]"
 
 jobs:
-  build-all-wheels:
-    name: Build All Wheels
+  build-wheels:
+    name: Build Wheels
     runs-on: ubuntu-latest
-    container: docker://torchextentionbuilder/manylinux:py${{ matrix.python }}-cu${{ matrix.cuda }}
+    container: docker://torchextentionbuilder/manylinux:py${{ matrix.python }}-pt${{ matrix.pytorch }}-cu${{ matrix.cuda }}
     strategy:
       fail-fast: false
       matrix:
-        cuda: ${{ fromJson(inputs.cuda-versions) }}
         python: ${{ fromJson(inputs.python-versions) }}
+        pytorch: ${{ fromJson(inputs.pytorch-versions) }}
+        cuda: ${{ fromJson(inputs.cuda-versions) }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
-      - name: Test
-        run: sh test.sh
-
-      - name: Build Wheel
+      - name: Build Wheels
         run: python setup.py bdist_wheel
         
-      - name: Repair Wheel
+      - name: Repair Wheels
         run: auditwheel repair dist/*.whl --plat manylinux_2_17_x86_64 --only-plat
         
-      - name: Patch Wheel
-        run: torchdist wheelhouse/*manylinux*.whl
+      - name: Patch Wheels
+        run: patch_wheels wheelhouse/*
 
-      - name: Cache Wheels
+      - name: Cache Patched Wheels
         uses: actions/upload-artifact@v3
         with:
-          path: torchdist
-          name: built-wheels
+          path: patched_wheels
+          name: py${{ matrix.python }}-wheels
+          retention-days: 1
+          
+      - name: Cache Script
+        uses: actions/upload-artifact@v3
+        with:
+          path: /usr/bin/combine_wheels.py
+          name: script
           retention-days: 1
   
-  # # build-all-wheels:
-  #  # name: Build All Wheels
-  # Aggregate Cuda Wheels:
-  #   runs-on: ubuntu-latest
-  #   needs: Build All Wheels
-  #   strategy:
-  #     fail-fast: false
-  #     matrix:
-  #       python: ${{ inputs.python-versions }}
+  combine-wheels:
+    name: Combine Wheels
+    needs: build-wheels
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ${{ fromJson(inputs.python-versions) }}
 
-  #   steps:
-  #     - name: Download Cached Wheels
-  #       uses: actions/download-artifact@v3
-  #       with:
-  #         name: ${{ matrix.python }}-wheels
+    steps:
+      - name: Download Patched Wheels
+        uses: actions/download-artifact@v3
+        with:
+          name: py${{ matrix.python }}-wheels
+          path: patched_wheels
+        
+      - name: Download Script
+        uses: actions/download-artifact@v3
+        with:
+          name: script
 
-  #     - name: Aggregate Cuda Wheels
-  #       uses: actions/download-artifact@v3
+      - name: Combine Wheels
+        run: python combine_wheels.py patched_wheels/*
+        
+      - name: Cache Final Wheels
+        uses: actions/upload-artifact@v3
+        with:
+          path: final_wheels
+          name: final-wheels
+          retention-days: 1
