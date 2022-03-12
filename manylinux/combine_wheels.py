@@ -35,7 +35,7 @@ def wrap_libraries(wheel_dir):
             os.makedirs(os.path.dirname(new_library_file))
             os.rename(library, new_library_file)
             libs_dir = glob.glob(wheel_dir + "/*.libs")[0].split("/")[-1]
-            check_output(["patchelf", "--set-rpath", f"$ORIGIN/../../torch/lib:$ORIGIN/../{libs_dir}", f"{new_library_file}"])
+            check_output(["patchelf", "--set-rpath", f"$ORIGIN/../torch/lib:$ORIGIN/../{libs_dir}", f"{new_library_file}"])
             wrapper_file_text += IMPORT_WRAPPER_CASE.format(library_name, library_code)
         with open(wheel_dir + "/" + library_name + ".py", "w") as f:
             f.write(wrapper_file_text)
