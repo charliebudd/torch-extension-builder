@@ -24,7 +24,7 @@ for WHEEL in $WHEELS; do
     # Stripping redundant packages and relinking to torch provided versions 
     PACKAGE_LIBS=`ls $TEMP_DIR/*.so`
     WHEEL_LIB_DIR=`ls -d $TEMP_DIR/*.libs`
-    PACKAGE_NAME=`echo $WHEEL_LIB_DIR | cut -d '/' -f2`
+    PACKAGE_NAME=`echo $WHEEL_LIB_DIR | cut -d '/' -f2 | cut -d '.' -f1`
     WHEEL_LIBS=`ls $TEMP_DIR/*.libs/`
 
     for WHEEL_LIB in $WHEEL_LIBS; do
