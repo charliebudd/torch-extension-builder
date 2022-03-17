@@ -27,9 +27,9 @@ ARG CUDA_VERSION
 # CUDA_ARCH_LIST and GCC_VERSION are really just dependant on the cuda 
 # version, but there seems to be no easy way to conditionally set these.
 # Expected values for respective cuda versions as follows...
-# CUDA_VERSION  CUDA_ARCH_LIST                      GCC_VERSION          
-# 10.2          6.0 6.1 6.2 7.0 7.2 7.5+PTX         8
-# 11.3          6.0 6.1 6.2 7.0 7.2 7.5 8.0 8.6+PTX 10
+# CUDA_VERSION  CUDA_ARCH_LIST                              GCC_VERSION          
+# 10.2          3.7 5.0 6.0 6.1 6.2 7.0 7.2 7.5+PTX         8
+# 11.3          3.7 5.0 6.0 6.1 6.2 7.0 7.2 7.5 8.0 8.6+PTX 10
 ARG CUDA_ARCH_LIST
 ARG GCC_VERSION
 

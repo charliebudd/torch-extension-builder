@@ -16,10 +16,10 @@ jobs:
         cuda-version: [10.2, 11.3]
         include:
           - cuda-version: 10.2
-            cuda-arch-list: "6.0 6.1 6.2 7.0 7.2 7.5+PTX"
+            cuda-arch-list: "3.7 5.0 6.0 6.1 6.2 7.0 7.2 7.5+PTX"
             gcc-version: 8
           - cuda-version: 11.3
-            cuda-arch-list: "6.0 6.1 6.2 7.0 7.2 7.5 8.0 8.6+PTX"
+            cuda-arch-list: "3.7 5.0 6.0 6.1 6.2 7.0 7.2 7.5 8.0 8.6+PTX"
             gcc-version: 10
 
     steps:
