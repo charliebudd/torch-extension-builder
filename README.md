@@ -18,7 +18,7 @@ Torch Extention Builder overcomes these problems in two main steps. Firstly, dep
 ## Usage
 The example workflow below illustrates an automated release system using Torch Extention Builder to build the PyPI wheels. 
 
-The first job `build-wheels` calls the workflow `build-pytorch-extention-wheels` which is hosted in this repository. This will produce a wheel for each python versions provided as arguments. Each wheel will support systems with any of the PyTorch and CUDA versions also provided as arguments. The resulting wheels will be chached in a github artifact named `final-wheels`. 
+The first job `build-wheels` calls the workflow `build-pytorch-extention-wheels` which is hosted in this repository. This will produce a wheel for each python versions provided as arguments. Each wheel will support systems with any of the PyTorch and CUDA versions also provided as arguments. The resulting wheels will be cached in a github artifact named `final-wheels`. 
 
 The second job `publish-wheels`, which is set to run once `build-wheels` has finished, will then download the cached wheels and publish them to TestPyPI.
 

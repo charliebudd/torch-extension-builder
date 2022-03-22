@@ -8,7 +8,6 @@ jobs:
   build-and-push-docker-image:
     name: Building manylinux:py${{ matrix.python-version }}-pt${{ matrix.pytorch-version }}-cu${{ matrix.cuda-version }}
     runs-on: ubuntu-latest
-    
     strategy:
       matrix:
         python-version: [3.6, 3.7, 3.8]
@@ -21,7 +20,6 @@ jobs:
           - cuda-version: 11.3
             cuda-arch-list: "3.7 5.0 6.0 6.1 6.2 7.0 7.2 7.5 8.0 8.6+PTX"
             gcc-version: 10
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -48,3 +46,50 @@ jobs:
           context: ./manylinux
           tags: torchextentionbuilder/manylinux:py${{ matrix.python-version }}-pt${{ matrix.pytorch-version }}-cu${{ matrix.cuda-version }}
           push: ${{ github.ref == 'refs/heads/main' }}
+  
+  build-test-package:
+    name: Build Test Package
+    needs: build-and-push-docker-image
+    uses: charliebudd/torch-extention-builder/.github/workflows/build-pytorch-extention-wheels.yml@main
+    with:
+      working-directory: test_extention
+      build-command: python setup.py bdist_wheel
+      python-versions: "[3.6, 3.7, 3.8]"
+      pytorch-versions: "[1.9, '1.10']"
+      cuda-versions: "[10.2, 11.3]"
+  
+  test-built-package:
+    name: Test Built Package
+    needs: build-test-package
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: [3.6, 3.7, 3.8]
+        pytorch: [1.9, '1.10']
+        cuda: [10.2, 11.3]
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Install Test Requirements
+        run: |
+          python -m pip install -U --force-reinstall pip
+          python -m pip install numpy torch==${{ matrix.pytorch }} -f https://download.pytorch.org/whl/cu$(echo ${{ matrix.cuda }} | sed 's/\.//')/torch_stable.html
+        
+      - name: Download Cached Wheels
+        uses: actions/download-artifact@v3
+        with:
+          name: final-wheels
+          path: final-wheels
+          
+      - name: Install Package From Cached Wheels
+        run: python -m pip install final-wheels/*cp$(echo ${{ matrix.python }} | sed 's/\.//')*.whl
+
+      - name: Run Test
+        run: python test_extention/test.py

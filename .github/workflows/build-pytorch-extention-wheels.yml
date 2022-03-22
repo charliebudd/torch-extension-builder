@@ -3,6 +3,12 @@ name: Build PyTorch Extention Wheels
 on:
   workflow_call:
     inputs:
+      working-directory:
+        type: string
+        default: "."
+      build-command:
+        type: string
+        default: "python setup.py bdist_wheel"
       python-versions:
         type: string
         default: "[3.6, 3.7, 3.8]"
@@ -28,32 +34,30 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
-      - name: Environment Check
-        run: |
-          python -V
-          python -c "import torch; print(f'PyTorch {torch.__version__}')"
-
       - name: Build Wheels
-        run: python setup.py bdist_wheel
+        working-directory: ${{ inputs.working-directory }}
+        run: ${{ inputs.build-command }}
         
       - name: Repair Wheels
+        working-directory: ${{ inputs.working-directory }}
         run: auditwheel repair dist/*.whl --plat manylinux_2_17_x86_64 --only-plat
         
       - name: Patch Wheels
-        run: patch_wheels wheelhouse/*
+        working-directory: ${{ inputs.working-directory }}
+        run: python /torch_extention_builder/patch_wheels.py wheelhouse/*manylinux*.whl
 
       - name: Cache Patched Wheels
         uses: actions/upload-artifact@v3
         with:
-          path: patched_wheels
+          path: ${{ inputs.working-directory }}/patched_wheels
           name: py${{ matrix.python }}-wheels
           retention-days: 1
           
       - name: Cache Script
         uses: actions/upload-artifact@v3
         with:
-          path: /usr/bin/combine_wheels.py
-          name: script
+          path: /torch_extention_builder
+          name: scripts
           retention-days: 1
   
   combine-wheels:
@@ -75,7 +79,7 @@ jobs:
       - name: Download Script
         uses: actions/download-artifact@v3
         with:
-          name: script
+          name: scripts
 
       - name: Combine Wheels
         run: python combine_wheels.py patched_wheels/*
@@ -83,6 +87,6 @@ jobs:
       - name: Cache Final Wheels
         uses: actions/upload-artifact@v3
         with:
-          path: final_wheels
+          path: combined_wheels
           name: final-wheels
           retention-days: 1

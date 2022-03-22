@@ -66,6 +66,4 @@ ENV LD_LIBRARY_PATH "${TORCH_LIBRARY_PATH}:$LD_LIBRARY_PATH"
 
 #===================================
 # Adding scripts...
-COPY combine_wheels.py /usr/bin
-COPY patch_wheels /usr/bin
-RUN chmod +x /usr/bin/patch_wheels
+ADD scripts /torch_extention_builder
