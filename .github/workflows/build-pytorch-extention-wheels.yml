@@ -14,7 +14,7 @@ on:
         default: "[3.6, 3.7, 3.8]"
       pytorch-versions:
         type: string
-        default: "[1.9, '1.10']"
+        default: "[1.9, '1.10', 1.11]"
       cuda-versions:
         type: string
         default: "[10.2, 11.3]"
@@ -30,6 +30,9 @@ jobs:
         python: ${{ fromJson(inputs.python-versions) }}
         pytorch: ${{ fromJson(inputs.pytorch-versions) }}
         cuda: ${{ fromJson(inputs.cuda-versions) }}
+      exclude:
+        - pytorch: 1.9
+          cuda: 11.3 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2

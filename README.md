@@ -4,11 +4,13 @@ A build system for generating (relatively) lightweight and portable PyPI wheels 
 ## Target System Support
 Packages built using Torch Extention Builder currently suppport the following runtime environments...
 
-![](https://img.shields.io/badge/OS-Linux-7a3b8f.svg)
-![](https://img.shields.io/badge/Python-3.6%20|%203.7%20|%203.8-3776ab.svg)
+<div>
+<img src="https://img.shields.io/badge/OS-Linux%20(glibc%20>=%202.17)-7a3b8f.svg"/>
+<img src="https://img.shields.io/badge/Python-3.6%20|%203.7%20|%203.8-3776ab.svg"/>
 <br />
-![](https://img.shields.io/badge/PyTorch-1.9%20|%201.10%20-EE4C2C.svg)
-![](https://img.shields.io/badge/CUDA-10.2%20|%2011.3-76b900.svg)
+<img src="https://img.shields.io/badge/PyTorch-1.9%20|%201.10%20|%201.11-EE4C2C.svg"/>
+<img src="https://img.shields.io/badge/CUDA-10.2%20|%2011.3-76b900.svg"/>
+<div />
 
 ## Explanation
 Torch extentions are tricky to deploy via PyPI. Source distributions require the user to have the CUDA Toolkit installed, the version of which must match the users PyTorch installation. Binary wheels on the other hand must link to the versions of the Torch and CUDA libraries available at compilation time. Bundling these libraries with the wheel creates wheels much larger then the PyPI wheel size limit. It also creates a clumsy user experience as a package for each PyTorch and CUDA version combination must be created. This means the user must specify the correct cuda and pytorch version when installing, for example ```pip install my_neat_package``` would become ```pip install my_neat_package_pt110_cu113```. 
