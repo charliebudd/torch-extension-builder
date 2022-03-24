@@ -18,12 +18,15 @@ on:
       cuda-versions:
         type: string
         default: "[10.2, 11.3]"
+      image-repo:
+        type: string
+        default: "manylinux"
 
 jobs:
   build-wheels:
     name: Build Wheels
     runs-on: ubuntu-latest
-    container: docker://torchextentionbuilder/manylinux:py${{ matrix.python }}-pt${{ matrix.pytorch }}-cu${{ matrix.cuda }}
+    container: docker://torchextentionbuilder/${{ matrix.image-repo }}:py${{ matrix.python }}-pt${{ matrix.pytorch }}-cu${{ matrix.cuda }}-${GITHUB_REF/refs\/tags\//}
     strategy:
       fail-fast: false
       matrix:

@@ -1,15 +1,20 @@
 name: Publish Docker Images
 
 on:
+  pull_request:
+    branches:
+      - main
   push:
-    branches: [main]
+    tags:
+      - 'v*'
 
 jobs:
-  build-and-push-docker-image:
-    name: Building manylinux:py${{ matrix.python-version }}-pt${{ matrix.pytorch-version }}-cu${{ matrix.cuda-version }}
+  build-images:
+    name: Build Images
     runs-on: ubuntu-latest
     strategy:
       matrix:
+        fail-fast: false
         python-version: [3.6, 3.7, 3.8]
         pytorch-version: [1.9, '1.10', 1.11]
         cuda-version: [10.2, 11.3]
@@ -47,20 +52,21 @@ jobs:
             CUDA_ARCH_LIST=${{ matrix.cuda-arch-list }}
             GCC_VERSION=${{ matrix.gcc-version }}
           context: ./manylinux
-          tags: torchextentionbuilder/manylinux:py${{ matrix.python-version }}-pt${{ matrix.pytorch-version }}-cu${{ matrix.cuda-version }}
+          tags: torchextentionbuilder/manylinux-test:py${{ matrix.python-version }}-pt${{ matrix.pytorch-version }}-cu${{ matrix.cuda-version }}
           push: ${{ github.ref == 'refs/heads/main' }}
   
   build-test-package:
     name: Build Test Package
-    needs: build-and-push-docker-image
+    needs: build-images
     uses: charliebudd/torch-extention-builder/.github/workflows/build-pytorch-extention-wheels.yml@main
     with:
       working-directory: test_extention
       build-command: python setup.py bdist_wheel
       python-versions: "[3.6, 3.7, 3.8]"
-      pytorch-versions: "[1.9, '1.10']"
+      pytorch-versions: "[1.9, '1.10', 1.11]"
       cuda-versions: "[10.2, 11.3]"
-  
+      image-repo: "manylinux-test"
+       
   test-built-package:
     name: Test Built Package
     needs: build-test-package
@@ -69,8 +75,11 @@ jobs:
       fail-fast: false
       matrix:
         python: [3.6, 3.7, 3.8]
-        pytorch: [1.9, '1.10']
+        pytorch: [1.9, '1.10', 1.11]
         cuda: [10.2, 11.3]
+        exclude:
+          - pytorch-version: 1.9
+            cuda-version: 11.3 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
@@ -96,3 +105,24 @@ jobs:
 
       - name: Run Test
         run: python test_extention/test.py
+
+  publish-images:
+    name: Publish Images
+    needs: test-built-package
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: [3.6, 3.7, 3.8]
+        pytorch: [1.9, '1.10', 1.11]
+        cuda: [10.2, 11.3]
+        exclude:
+          - pytorch-version: 1.9
+            cuda-version: 11.3 
+    steps:
+      - name: Copy Images From Test Repository
+        uses: akhilerm/tag-push-action@v2.0.0
+        with:
+          src: docker.io/torchextentionbuilder/manylinux-test:py${{ matrix.python-version }}-pt${{ matrix.pytorch-version }}-cu${{ matrix.cuda-version }}
+          dst: docker.io/torchextentionbuilder/manylinux:py${{ matrix.python-version }}-pt${{ matrix.pytorch-version }}-cu${{ matrix.cuda-version }}-${GITHUB_REF/refs\/tags\//}
