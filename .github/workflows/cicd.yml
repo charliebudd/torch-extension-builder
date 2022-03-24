@@ -53,12 +53,12 @@ jobs:
             GCC_VERSION=${{ matrix.gcc-version }}
           context: ./manylinux
           tags: torchextentionbuilder/manylinux-test:py${{ matrix.python-version }}-pt${{ matrix.pytorch-version }}-cu${{ matrix.cuda-version }}
-          push: ${{ github.ref == 'refs/heads/main' }}
+          push: true
   
   build-test-package:
     name: Build Test Package
     needs: build-images
-    uses: charliebudd/torch-extention-builder/.github/workflows/build-pytorch-extention-wheels.yml
+    uses: charliebudd/torch-extention-builder/.github/workflows/build-pytorch-extention-wheels.yml@${GITHUB_REF/refs\/heads\//}
     with:
       working-directory: test_extention
       build-command: python setup.py bdist_wheel
