@@ -74,9 +74,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python: [3.6, 3.7, 3.8]
-        pytorch: [1.9, '1.10', 1.11]
-        cuda: [10.2, 11.3]
+        python-version: [3.6, 3.7, 3.8]
+        pytorch-version: [1.9, '1.10', 1.11]
+        cuda-version: [10.2, 11.3]
         exclude:
           - pytorch-version: 1.9
             cuda-version: 11.3 
@@ -92,7 +92,7 @@ jobs:
       - name: Install Test Requirements
         run: |
           python -m pip install -U --force-reinstall pip
-          python -m pip install numpy torch==${{ matrix.pytorch }} -f https://download.pytorch.org/whl/cu$(echo ${{ matrix.cuda }} | sed 's/\.//')/torch_stable.html
+          python -m pip install numpy torch==${{ matrix.pytorch-version }} -f https://download.pytorch.org/whl/cu$(echo ${{ matrix.cuda-version }} | sed 's/\.//')/torch_stable.html
         
       - name: Download Cached Wheels
         uses: actions/download-artifact@v3
@@ -101,7 +101,7 @@ jobs:
           path: final-wheels
           
       - name: Install Package From Cached Wheels
-        run: python -m pip install final-wheels/*cp$(echo ${{ matrix.python }} | sed 's/\.//')*.whl
+        run: python -m pip install final-wheels/*cp$(echo ${{ matrix.python-version }} | sed 's/\.//')*.whl
 
       - name: Run Test
         run: python test_extention/test.py
@@ -114,9 +114,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python: [3.6, 3.7, 3.8]
-        pytorch: [1.9, '1.10', 1.11]
-        cuda: [10.2, 11.3]
+        python-version: [3.6, 3.7, 3.8]
+        pytorch-version: [1.9, '1.10', 1.11]
+        cuda-version: [10.2, 11.3]
         exclude:
           - pytorch-version: 1.9
             cuda-version: 11.3 
