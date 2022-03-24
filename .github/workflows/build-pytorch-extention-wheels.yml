@@ -33,6 +33,9 @@ jobs:
         python-version: ${{ fromJson(inputs.python-versions) }}
         pytorch-version: ${{ fromJson(inputs.pytorch-versions) }}
         cuda-version: ${{ fromJson(inputs.cuda-versions) }}
+        exclude:
+          - pytorch-version: 1.9
+            cuda-version: 11.3 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
