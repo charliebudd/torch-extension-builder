@@ -105,7 +105,15 @@ jobs:
 
       - name: Run Test
         run: python test_extention/test.py
-
+       
+  tests-passed:
+    name: Tests Passed
+    needs: test-built-package
+    runs-on: ubuntu-latest
+    steps:
+      - name: Tests Passed
+        run: echo "Tests Passed"
+        
   publish-images:
     name: Publish Images
     needs: test-built-package
