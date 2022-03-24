@@ -36,6 +36,8 @@ jobs:
         exclude:
           - pytorch-version: 1.9
             cuda-version: 11.3 
+          - python-version: 3.6
+            pytorch-version: 1.11
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2

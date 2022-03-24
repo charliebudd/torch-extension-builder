@@ -1,12 +1,12 @@
 name: CI CD
 
-on:
-  pull_request:
-    branches:
-      - main
-  push:
-    # tags:
-    #   - 'v*'
+on: push
+  # pull_request:
+  #   branches:
+  #     - main
+  # push:
+  #   # tags:
+  #   #   - 'v*'
 
 jobs:
   build-images:
@@ -15,7 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.6, 3.7, 3.8]
+        python-version: [3.6, 3.7, 3.8, 3.9]
         pytorch-version: [1.9, '1.10', 1.11]
         cuda-version: [10.2, 11.3]
         include:
@@ -28,6 +28,8 @@ jobs:
         exclude:
           - pytorch-version: 1.9
             cuda-version: 11.3 
+          - python-version: 3.6
+            pytorch-version: 1.11
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -80,6 +82,8 @@ jobs:
         exclude:
           - pytorch-version: 1.9
             cuda-version: 11.3 
+          - python-version: 3.6
+            pytorch-version: 1.11
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
@@ -128,6 +132,8 @@ jobs:
         exclude:
           - pytorch-version: 1.9
             cuda-version: 11.3 
+          - python-version: 3.6
+            pytorch-version: 1.11
     steps:
       - name: Copy Images From Test Repository
         uses: akhilerm/tag-push-action@v2.0.0
