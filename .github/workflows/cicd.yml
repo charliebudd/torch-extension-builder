@@ -1,4 +1,4 @@
-name: Publish Docker Images
+name: CI CD
 
 on:
   pull_request:
@@ -13,8 +13,8 @@ jobs:
     name: Build Images
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        fail-fast: false
         python-version: [3.6, 3.7, 3.8]
         pytorch-version: [1.9, '1.10', 1.11]
         cuda-version: [10.2, 11.3]
