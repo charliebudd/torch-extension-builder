@@ -64,7 +64,7 @@ jobs:
     with:
       working-directory: test_extention
       build-command: python setup.py bdist_wheel
-      python-versions: "[3.6, 3.7, 3.8]"
+      python-versions: "[3.6, 3.7, 3.8, 3.9]"
       pytorch-versions: "[1.9, '1.10', 1.11]"
       cuda-versions: "[10.2, 11.3]"
       image-repo: "manylinux-test"
@@ -76,7 +76,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.6, 3.7, 3.8]
+        python-version: [3.6, 3.7, 3.8, 3.9]
         pytorch-version: [1.9, '1.10', 1.11]
         cuda-version: [10.2, 11.3]
         exclude:
@@ -126,7 +126,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.6, 3.7, 3.8]
+        python-version: [3.6, 3.7, 3.8, 3.9]
         pytorch-version: [1.9, '1.10', 1.11]
         cuda-version: [10.2, 11.3]
         exclude:
