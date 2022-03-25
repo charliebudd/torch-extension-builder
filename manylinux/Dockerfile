@@ -52,8 +52,10 @@ RUN yum -y install zip devtoolset-${GCC_VERSION}-toolchain; \
 # Setting up python environment...
 RUN ln -sf python${PYTHON_VERSION} /usr/local/bin/python; \
     ln -sf $(ls /opt/_internal/cpython-${PYTHON_VERSION}.* -d) /opt/_internal/cpython-${PYTHON_VERSION}; \
+    python -m pip install --upgrade pip; \
     python -m pip --no-cache-dir install setuptools ninja numpy wheel; \
-    python -m pip --no-cache-dir install torch==${PYTORCH_VERSION} -f https://download.pytorch.org/whl/cu${CUDA_VERSION//.}/torch_stable.html;
+    export FULL_PYTORCH_VERSION=$(python -m pip index versions torch -f https://download.pytorch.org/whl/torch_stable.html | grep -o ${PYTORCH_VERSION}.[0-9]+cu${CUDA_VERSION//.} | head -n 1); \
+    python -m pip --no-cache-dir install torch==${FULL_PYTORCH_VERSION} -f https://download.pytorch.org/whl/torch_stable.html;
 
 #===================================
 # Setting environment variables...
