@@ -26,7 +26,7 @@ jobs:
   build-wheels:
     name: Build Wheels
     runs-on: ubuntu-latest
-    container: docker://torchextentionbuilder/${{ matrix.image-repo }}:py${{ matrix.python-version }}-pt${{ matrix.pytorch-version }}-cu${{ matrix.cuda-version }}-${GITHUB_REF/refs\/tags\//}
+    container: docker://torchextentionbuilder/${{ matrix.image-repo }}:py${{ matrix.python-version }}-pt${{ matrix.pytorch-version }}-cu${{ matrix.cuda-version }}-${{ GITHUB_REF/refs\/tags\// }}
     strategy:
       fail-fast: false
       matrix:
