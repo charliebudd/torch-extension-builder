@@ -1,0 +1,9 @@
+name: TEST
+
+on: push
+
+jobs:
+  setup:
+      runs-on: ubuntu-latest
+      steps:
+        - run: echo ${{ github.action_ref }}

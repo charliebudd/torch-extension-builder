@@ -18,15 +18,21 @@ on:
       cuda-versions:
         type: string
         default: "[10.2, 11.3]"
-      image-repo:
-        type: string
-        default: "manylinux"
 
 jobs:
+  setup:
+    name: Setup
+    runs-on: ubuntu-latest
+    outputs:
+      container: ${{ steps.set-image.outputs.container }}
+    steps:
+      - id: set-image
+        run: echo "::set-output name=container::{
   build-wheels:
     name: Build Wheels
     runs-on: ubuntu-latest
-    container: docker://torchextentionbuilder/${{ inputs.image-repo }}:py${{ matrix.python-version }}-pt${{ matrix.pytorch-version }}-cu${{ matrix.cuda-version }} #-${{ github.ref_name }}
+    container: 
+      image: docker://torchextentionbuilder/manylinux:py${{ matrix.python-version }}-pt${{ matrix.pytorch-version }}-cu${{ matrix.cuda-version }}-${{ github.action_ref }}
     strategy:
       fail-fast: false
       matrix:
