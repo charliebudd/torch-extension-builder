@@ -1,10 +1,12 @@
 name: CI CD
 
-on: #push
-  # pull_request:
-  #   branches:
-  #     - main
+on:
+  pull_request:
+    branches:
+      - main
   push:
+    branches:
+      - main
     tags:
       - 'v*'
 
@@ -54,7 +56,7 @@ jobs:
             CUDA_ARCH_LIST=${{ matrix.cuda-arch-list }}
             GCC_VERSION=${{ matrix.gcc-version }}
           context: ./manylinux
-          tags: torchextentionbuilder/manylinux:py${{ matrix.python-version }}-pt${{ matrix.pytorch-version }}-cu${{ matrix.cuda-version }}-${{ github.ref_name }}
+          tags: torchextentionbuilder/manylinux:py${{ matrix.python-version }}-pt${{ matrix.pytorch-version }}-cu${{ matrix.cuda-version }}
           push: true
   
   build-test-package:
@@ -121,7 +123,7 @@ jobs:
   publish-images:
     name: Publish Images
     needs: test-built-package
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: ${{ github.event_name == 'push' }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -135,8 +137,8 @@ jobs:
           - python-version: 3.6
             pytorch-version: 1.11
     steps:
-      - name: Copy Images From Test Repository
+      - name: Tagging Images
         uses: akhilerm/tag-push-action@v2.0.0
         with:
-          src: docker.io/torchextentionbuilder/manylinux-test:py${{ matrix.python-version }}-pt${{ matrix.pytorch-version }}-cu${{ matrix.cuda-version }}
-          dst: docker.io/torchextentionbuilder/manylinux:py${{ matrix.python-version }}-pt${{ matrix.pytorch-version }}-cu${{ matrix.cuda-version }} #-${{ github.ref_name }}
+          src: docker.io/torchextentionbuilder/manylinux:py${{ matrix.python-version }}-pt${{ matrix.pytorch-version }}-cu${{ matrix.cuda-version }}
+          dst: docker.io/torchextentionbuilder/manylinux:py${{ matrix.python-version }}-pt${{ matrix.pytorch-version }}-cu${{ matrix.cuda-version }}-${{ github.ref_name }}
