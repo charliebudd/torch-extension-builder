@@ -1,5 +1,5 @@
 #===================================
-# Docker image template for building pytorch extentions.
+# Docker image template for building pytorch extensions.
 
 # The image is paramaterised by python, and cuda versions and is built on top of the 
 # manylinux image "manylinux2014_x86_64" (manylinux_2_17_x86_64 in the new system)
@@ -9,7 +9,7 @@
 # https://github.com/microsoft/onnxruntime/blob/master/tools/ci_build/github/linux/docker/Dockerfile.manylinux2014_cuda11
 # The justification for this methodology is that distribution of NVIDIA CUDA Driver Libraries(libcuda.so, libnvidia-ptxjitcompiler.so) 
 # is only alowed if the application is built in a docker image starting from a nvidia docker image. 
-# Pytorch extentions however depend on torch and so can rely on the libraries distibuted in the torch package.
+# Pytorch extensions however depend on torch and so can rely on the libraries distibuted in the torch package.
 
 #===================================
 # Starting with manylinux2014 image, CentOS7
@@ -68,4 +68,4 @@ ENV LD_LIBRARY_PATH "${TORCH_LIBRARY_PATH}:$LD_LIBRARY_PATH"
 
 #===================================
 # Adding scripts...
-ADD scripts /torch_extention_builder
+ADD scripts /torch_extension_builder
