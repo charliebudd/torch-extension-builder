@@ -1,4 +1,4 @@
-name: Build PyTorch Extention Wheels
+name: Build PyTorch Extension Wheels
 
 on:
   workflow_call:
@@ -26,7 +26,7 @@ jobs:
   build-wheels:
     name: Build Wheels
     runs-on: ubuntu-latest
-    container: docker://torchextentionbuilder/${{ matrix.image-repo }}:py${{ matrix.python-version }}-pt${{ matrix.pytorch-version }}-cu${{ matrix.cuda-version }}-${{ github.ref_name }}
+    container: docker://torchextensionbuilder/${{ matrix.image-repo }}:py${{ matrix.python-version }}-pt${{ matrix.pytorch-version }}-cu${{ matrix.cuda-version }}-${{ github.ref_name }}
     strategy:
       fail-fast: false
       matrix:
@@ -52,7 +52,7 @@ jobs:
         
       - name: Patch Wheels
         working-directory: ${{ inputs.working-directory }}
-        run: python /torch_extention_builder/patch_wheels.py wheelhouse/*manylinux*.whl
+        run: python /torch_extension_builder/patch_wheels.py wheelhouse/*manylinux*.whl
 
       - name: Cache Patched Wheels
         uses: actions/upload-artifact@v3
@@ -64,7 +64,7 @@ jobs:
       - name: Cache Script
         uses: actions/upload-artifact@v3
         with:
-          path: /torch_extention_builder
+          path: /torch_extension_builder
           name: scripts
           retention-days: 1
   
