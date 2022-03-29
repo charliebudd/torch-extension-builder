@@ -56,15 +56,15 @@ jobs:
             CUDA_ARCH_LIST=${{ matrix.cuda-arch-list }}
             GCC_VERSION=${{ matrix.gcc-version }}
           context: ./manylinux
-          tags: torchextentionbuilder/manylinux:py${{ matrix.python-version }}-pt${{ matrix.pytorch-version }}-cu${{ matrix.cuda-version }}
+          tags: torchextensionbuilder/manylinux:py${{ matrix.python-version }}-pt${{ matrix.pytorch-version }}-cu${{ matrix.cuda-version }}
           push: true
   
   build-test-package:
     name: Build Test Package
     needs: build-images
-    uses: ./.github/workflows/build-pytorch-extention-wheels.yml
+    uses: ./.github/workflows/build-pytorch-extension-wheels.yml
     with:
-      working-directory: test_extention
+      working-directory: test_extension
       build-command: python setup.py bdist_wheel
       python-versions: "[3.6, 3.7, 3.8, 3.9]"
       pytorch-versions: "[1.9, '1.10', 1.11]"
@@ -113,7 +113,7 @@ jobs:
         run: python -m pip install final-wheels/*cp$(echo ${{ matrix.python-version }} | sed 's/\.//')*.whl
 
       - name: Run Test
-        run: python test_extention/test.py
+        run: python test_extension/test.py
        
   tests-passed:
     name: Tests Passed
@@ -143,5 +143,5 @@ jobs:
       - name: Tagging Images
         uses: akhilerm/tag-push-action@v2.0.0
         with:
-          src: docker.io/torchextentionbuilder/manylinux:py${{ matrix.python-version }}-pt${{ matrix.pytorch-version }}-cu${{ matrix.cuda-version }}
-          dst: docker.io/torchextentionbuilder/manylinux:py${{ matrix.python-version }}-pt${{ matrix.pytorch-version }}-cu${{ matrix.cuda-version }}-${{ github.ref_name }}
+          src: docker.io/torchextensionbuilder/manylinux:py${{ matrix.python-version }}-pt${{ matrix.pytorch-version }}-cu${{ matrix.cuda-version }}
+          dst: docker.io/torchextensionbuilder/manylinux:py${{ matrix.python-version }}-pt${{ matrix.pytorch-version }}-cu${{ matrix.cuda-version }}-${{ github.ref_name }}
