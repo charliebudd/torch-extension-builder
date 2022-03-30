@@ -15,12 +15,11 @@ jobs:
     name: Setup
     runs-on: ubuntu-latest
     outputs:
-      tag: ${{ steps.get-tag.outputs.image-tag }}
+      image-tag: ${{ steps.get-tag.outputs.image-tag }}
     steps:
       - name: Get Tag
         id: get-tag
         run: |
-          echo $TAG
           if [[ $TAG == main ]] || [[ $TAG =~ v[0-9] ]]; then
               echo "::set-output name=image-tag::-$TAG"
           else
