@@ -3,13 +3,16 @@ name: Sub Workflow
 on: workflow_call
 
 jobs:
-  get_tag:
-    name: Get Tag
+
+  setup:
+    name: Setup
     runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.get-tag.outputs.tag }}
     steps:
-      - name: Checkout code
+      - name: Get Tag
+        id: get-tag
         run: |
-          echo ${{ github.job }}
           REQUEST_BASE=https://api.github.com/repos/${{ github.repository }}/actions
           JOBS_REQUEST=$REQUEST_BASE/runs/${{ github.run_id }}/jobs
           AUTH=username:${{ secrets.GITHUB_TOKEN }}
@@ -18,4 +21,17 @@ jobs:
           JOB_IDS=$(echo $JOBS | sed 's/\"id\": /\n"id\": /g' | cut -d ',' -f1 | grep "\"id\": " | sed 's/\"id\": //g')
           LOGS_REQUEST=$REQUEST_BASE/jobs/${JOB_IDS[0]}/logs
           LOGS=$(curl -u $AUTH -H $HEADER $LOGS_REQUEST -L --output -)
-          echo $LOGS
+          DTAG=$(echo $LOGS | grep -o "Job defined at: charliebudd/torch-extension-builder/.github/workflows/sub-workflow.yml@refs/.*/.*" | sed 's:.*/::')
+          TAG=v8
+          if [[ $TAG == main ]] || [[ $TAG =~ v[0-9] ]]; then
+              echo "::set-output name=tag::-$TAG"
+          else
+              echo "::set-output name=tag::"
+          fi
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    needs: setup
+    steps:
+      - run: echo ${{needs.setup.outputs.tag}}
