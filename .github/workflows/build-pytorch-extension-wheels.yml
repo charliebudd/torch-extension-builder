@@ -20,11 +20,36 @@ on:
         default: "[10.2, 11.3]"
 
 jobs:
+  setup:
+    name: Setup
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.get-tag.outputs.image-tag }}
+    steps:
+      - name: Get Tag
+        id: get-tag
+        run: |
+          REQUEST_BASE=https://api.github.com/repos/${{ github.repository }}/actions
+          JOBS_REQUEST=$REQUEST_BASE/runs/${{ github.run_id }}/jobs
+          AUTH=username:${{ secrets.GITHUB_TOKEN }}
+          HEADER="Accept: application/vnd.github.v3+json"
+          JOBS=$(curl -u $AUTH -H $HEADER $JOBS_REQUEST -L --output -)
+          JOB_IDS=$(echo $JOBS | sed 's/\"id\": /\n"id\": /g' | grep ' / Setup' | cut -d ',' -f1 | sed 's/\"id\": //g')
+          LOGS_REQUEST=$REQUEST_BASE/jobs/${JOB_IDS[0]}/logs
+          LOGS=$(curl -u $AUTH -H $HEADER $LOGS_REQUEST -L --output -)
+          TAG=$(echo $LOGS | grep -o "Job defined at: charliebudd/torch-extension-builder/.github/workflows/sub-workflow.yml@refs/.*/.*" | sed 's:.*/::')
+          if [[ $TAG == main ]] || [[ $TAG =~ v[0-9] ]]; then
+              echo "::set-output name=image-tag::-$TAG"
+          else
+              echo "::set-output name=image-tag::"
+          fi
+
   build-wheels:
     name: Build Wheels
+    needs: setup
     runs-on: ubuntu-latest
     container: 
-      image: docker://torchextensionbuilder/manylinux:py${{ matrix.python-version }}-pt${{ matrix.pytorch-version }}-cu${{ matrix.cuda-version }}
+      image: docker://torchextensionbuilder/manylinux:py${{ matrix.python-version }}-pt${{ matrix.pytorch-version }}-cu${{ matrix.cuda-version }}${{needs.setup.outputs.image-tag}}
     strategy:
       fail-fast: false
       matrix:
