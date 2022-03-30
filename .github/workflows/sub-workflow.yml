@@ -1,0 +1,17 @@
+name: Sub Workflow
+
+on: workflow_call
+
+jobs:
+  get_tag:
+    name: Get Tag
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        run: |
+          REQUEST_BASE=https://api.github.com/repos/${{ github.repository }}/actions
+          JOBS_REQUEST=$REQUEST_BASE/runs/${{ github.run_id }}/jobs
+          AUTH=username:${{ secrets.GITHUB_TOKEN }}
+          HEADER="Accept: application/vnd.github.v3+json"
+          RESULT=$(curl -u $AUTH -H $HEADER $JOBS_REQUEST -L --output -)
+          echo $RESULT
