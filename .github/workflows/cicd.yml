@@ -11,8 +11,25 @@ on:
       - 'v*'
 
 jobs:
+  setup:
+    name: Setup
+    runs-on: ubuntu-latest
+    outputs:
+      image-tag: ${{ steps.get-tag.outputs.image-tag }}
+    steps:
+      - name: Get Tag
+        id: get-tag
+        run: |
+          if [[ $TAG == main ]] || [[ $TAG =~ v[0-9] ]]; then
+              echo "::set-output name=image-tag::-$TAG"
+          else
+              echo "::set-output name=image-tag::"
+          fi
+        env:
+          TAG: ${{ github.ref_name }}
   build-images:
     name: Build Images
+    needs: setup
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -56,7 +73,7 @@ jobs:
             CUDA_ARCH_LIST=${{ matrix.cuda-arch-list }}
             GCC_VERSION=${{ matrix.gcc-version }}
           context: ./manylinux
-          tags: torchextensionbuilder/manylinux:py${{ matrix.python-version }}-pt${{ matrix.pytorch-version }}-cu${{ matrix.cuda-version }}
+          tags: torchextensionbuilder/manylinux:py${{ matrix.python-version }}-pt${{ matrix.pytorch-version }}-cu${{ matrix.cuda-version }}${{needs.setup.outputs.image-tag}}
           push: true
   
   build-test-package:
@@ -123,31 +140,3 @@ jobs:
     steps:
       - name: Tests Passed
         run: echo "Tests Passed"
-        
-  publish-images:
-    name: Publish Images
-    needs: test-built-package
-    if: ${{ github.event_name == 'push' }}
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: [3.6, 3.7, 3.8, 3.9]
-        pytorch-version: [1.9, '1.10', 1.11]
-        cuda-version: [10.2, 11.3]
-        exclude:
-          - pytorch-version: 1.9
-            cuda-version: 11.3 
-          - python-version: 3.6
-            pytorch-version: 1.11
-    steps:
-      - name: DockerHub Login
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Tagging Images
-        uses: akhilerm/tag-push-action@v2.0.0
-        with:
-          src: docker.io/torchextensionbuilder/manylinux:py${{ matrix.python-version }}-pt${{ matrix.pytorch-version }}-cu${{ matrix.cuda-version }}
-          dst: docker.io/torchextensionbuilder/manylinux:py${{ matrix.python-version }}-pt${{ matrix.pytorch-version }}-cu${{ matrix.cuda-version }}-${{ github.ref_name }}

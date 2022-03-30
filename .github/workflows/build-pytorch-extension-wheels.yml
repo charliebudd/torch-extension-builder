@@ -24,7 +24,7 @@ jobs:
     name: Setup
     runs-on: ubuntu-latest
     outputs:
-      tag: ${{ steps.get-tag.outputs.image-tag }}
+      image-tag: ${{ steps.get-tag.outputs.image-tag }}
     steps:
       - name: Get Tag
         id: get-tag
