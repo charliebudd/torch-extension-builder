@@ -11,68 +11,68 @@ on:
       - 'v*'
 
 jobs:
-  build-images:
-    name: Build Images
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: [3.6, 3.7, 3.8, 3.9]
-        pytorch-version: [1.9, '1.10', 1.11]
-        cuda-version: [10.2, 11.3]
-        include:
-          - cuda-version: 10.2
-            cuda-arch-list: "3.7 5.0 6.0 6.1 6.2 7.0 7.2 7.5+PTX"
-            gcc-version: 8
-          - cuda-version: 11.3
-            cuda-arch-list: "3.7 5.0 6.0 6.1 6.2 7.0 7.2 7.5 8.0 8.6+PTX"
-            gcc-version: 10
-        exclude:
-          - pytorch-version: 1.9
-            cuda-version: 11.3 
-          - python-version: 3.6
-            pytorch-version: 1.11
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+  # build-images:
+  #   name: Build Images
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       python-version: [3.6, 3.7, 3.8, 3.9]
+  #       pytorch-version: [1.9, '1.10', 1.11]
+  #       cuda-version: [10.2, 11.3]
+  #       include:
+  #         - cuda-version: 10.2
+  #           cuda-arch-list: "3.7 5.0 6.0 6.1 6.2 7.0 7.2 7.5+PTX"
+  #           gcc-version: 8
+  #         - cuda-version: 11.3
+  #           cuda-arch-list: "3.7 5.0 6.0 6.1 6.2 7.0 7.2 7.5 8.0 8.6+PTX"
+  #           gcc-version: 10
+  #       exclude:
+  #         - pytorch-version: 1.9
+  #           cuda-version: 11.3 
+  #         - python-version: 3.6
+  #           pytorch-version: 1.11
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v2
 
-      - name: Set up Docker Buildx
-        id: buildx
-        uses: docker/setup-buildx-action@v1
+  #     - name: Set up Docker Buildx
+  #       id: buildx
+  #       uses: docker/setup-buildx-action@v1
 
-      - name: Login to DockerHub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+  #     - name: Login to DockerHub
+  #       uses: docker/login-action@v1
+  #       with:
+  #         username: ${{ secrets.DOCKERHUB_USERNAME }}
+  #         password: ${{ secrets.DOCKERHUB_TOKEN }}
       
-      - name: Build image and push to Docker Hub
-        uses: docker/build-push-action@v2
-        with:
-          build-args: |
-            PYTHON_VERSION=${{ matrix.python-version }}
-            PYTORCH_VERSION=${{ matrix.pytorch-version }}
-            CUDA_VERSION=${{ matrix.cuda-version }}
-            CUDA_ARCH_LIST=${{ matrix.cuda-arch-list }}
-            GCC_VERSION=${{ matrix.gcc-version }}
-          context: ./manylinux
-          tags: torchextensionbuilder/manylinux:py${{ matrix.python-version }}-pt${{ matrix.pytorch-version }}-cu${{ matrix.cuda-version }}
-          push: true
+  #     - name: Build image and push to Docker Hub
+  #       uses: docker/build-push-action@v2
+  #       with:
+  #         build-args: |
+  #           PYTHON_VERSION=${{ matrix.python-version }}
+  #           PYTORCH_VERSION=${{ matrix.pytorch-version }}
+  #           CUDA_VERSION=${{ matrix.cuda-version }}
+  #           CUDA_ARCH_LIST=${{ matrix.cuda-arch-list }}
+  #           GCC_VERSION=${{ matrix.gcc-version }}
+  #         context: ./manylinux
+  #         tags: torchextensionbuilder/manylinux:py${{ matrix.python-version }}-pt${{ matrix.pytorch-version }}-cu${{ matrix.cuda-version }}
+  #         push: true
   
-  build-test-package:
-    name: Build Test Package
-    needs: build-images
-    uses: ./.github/workflows/build-pytorch-extension-wheels.yml
-    with:
-      working-directory: test_extension
-      build-command: python setup.py bdist_wheel
-      python-versions: "[3.6, 3.7, 3.8, 3.9]"
-      pytorch-versions: "[1.9, '1.10', 1.11]"
-      cuda-versions: "[10.2, 11.3]"
+  # build-test-package:
+  #   name: Build Test Package
+  #   needs: build-images
+  #   uses: ./.github/workflows/build-pytorch-extension-wheels.yml
+  #   with:
+  #     working-directory: test_extension
+  #     build-command: python setup.py bdist_wheel
+  #     python-versions: "[3.6, 3.7, 3.8, 3.9]"
+  #     pytorch-versions: "[1.9, '1.10', 1.11]"
+  #     cuda-versions: "[10.2, 11.3]"
        
   test-built-package:
     name: Test Built Package
-    needs: build-test-package
+    # needs: build-test-package
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
