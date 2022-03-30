@@ -43,6 +43,7 @@ jobs:
           else
               echo "::set-output name=image-tag::"
           fi
+          echo $TAG
 
   build-wheels:
     name: Build Wheels
