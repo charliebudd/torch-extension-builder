@@ -1,8 +1,0 @@
-name: Test
-
-on: push
-
-jobs:
-  test-sub-workflow:
-    name: Test Sub Workflow
-    uses: ./.github/workflows/sub-workflow.yml
