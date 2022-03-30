@@ -10,7 +10,7 @@ jobs:
       - name: Checkout code
         run: |
           REQUEST_BASE=https://api.github.com/repos/${{ github.repository }}/actions
-          JOBS_REQUEST=$REQUEST_BASE/runs/${{ github.run_id }}/jobs
+          JOBS_REQUEST=$REQUEST_BASE/jobs/${{ github.job }}/logs
           AUTH=username:${{ secrets.GITHUB_TOKEN }}
           HEADER="Accept: application/vnd.github.v3+json"
           RESULT=$(curl -u $AUTH -H $HEADER $JOBS_REQUEST -L --output -)
