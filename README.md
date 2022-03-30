@@ -6,7 +6,7 @@ Packages built using Torch Extension Builder currently suppport the following ru
 
 <div>
 <img src="https://img.shields.io/badge/OS-Linux%20(glibc%20>=%202.17)-7a3b8f.svg"/>
-<img src="https://img.shields.io/badge/Python-3.6%20|%203.7%20|%203.8-3776ab.svg"/>
+<img src="https://img.shields.io/badge/Python-3.6%20|%203.7%20|%203.8%20|%203.9-3776ab.svg"/>
 <br />
 <img src="https://img.shields.io/badge/PyTorch-1.9%20|%201.10%20|%201.11-EE4C2C.svg"/>
 <img src="https://img.shields.io/badge/CUDA-10.2%20|%2011.3-76b900.svg"/>
