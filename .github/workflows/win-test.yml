@@ -43,24 +43,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: DockerHub Login
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      
-      - name: Build image and push to Docker Hub
-        uses: docker/build-push-action@v2
-        with:
-          build-args: |
-            PYTHON_VERSION=${{ matrix.python-version }}
-            PYTORCH_VERSION=${{ matrix.pytorch-version }}
-            CUDA_VERSION=${{ matrix.cuda-version }}
-            CUDA_ARCH_LIST=${{ matrix.cuda-arch-list }}
-          context: ./windows
-          tags: torchextensionbuilder/windows:py${{ matrix.python-version }}-pt${{ matrix.pytorch-version }}-cu${{ matrix.cuda-version }}${{needs.setup.outputs.image-tag}}
-          push: true
-  
+      - name: Build and push image
+        working-directory: .
+        run: |
+          docker login -u $env:USER -p $env:TOKEN
+          docker build ./windows -t windows:py${{ matrix.python-version }}-pt${{ matrix.pytorch-version }}-cu${{ matrix.cuda-version }}${{needs.setup.outputs.image-tag}}
+          docker image push torchextensionbuilder/windows:py${{ matrix.python-version }}-pt${{ matrix.pytorch-version }}-cu${{ matrix.cuda-version }}${{needs.setup.outputs.image-tag}}
+          docker logout
+        env:
+          USER: ${{ secrets.DOCKERHUB_USERNAME }}
+          TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+
   build-wheels:
     name: Build Wheels
     needs: [setup, build-images]
