@@ -39,6 +39,9 @@ jobs:
             cuda-version: 11.3 
           - python-version: 3.6
             pytorch-version: 1.11
+          # windows only...
+          - pytorch-version: 1.11
+            cuda-version: 10.2
     steps:
       - name: Checkout code
         uses: actions/checkout@v2

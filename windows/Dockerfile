@@ -1,5 +1,4 @@
 FROM mcr.microsoft.com/windows/servercore:ltsc2022
-# 10.0.19042.1415
 
 SHELL ["cmd", "/S", "/C"]
 
@@ -30,12 +29,8 @@ RUN curl -k -L "%CUDA_URL%/%CUDA_FILE%" --output "%CUDA_FILE%" & \
 # Setting up python...
 
 ARG PYTHON_VERSION="3.9"
-ARG PYTHON_URL="https://www.python.org/ftp/python/$PYTHON_VERSION.0"
-ARG PYTHON_FILE="python-$PYTHON_VERSION.0-amd64.exe"
-
-RUN curl -k -L "%PYTHON_URL%/%PYTHON_FILE%" --output "%PYTHON_FILE%" & \
-    %PYTHON_FILE% /quiet InstallAllUsers=1 PrependPath=1 Include_test=0 & \
-    del -f "%PYTHON_FILE%"
+ADD install-python.bat /
+RUN install-python.bat %PYTHON_VERSION%
 
 #===================================
 # Setting up python environment...
