@@ -46,10 +46,10 @@ jobs:
       - name: Build and push image
         working-directory: .
         run: |
-          docker login -u $env:USER -p $env:TOKEN
-          docker build ./windows -t torchextensionbuilder/windows:py${{ matrix.python-version }}-pt${{ matrix.pytorch-version }}-cu${{ matrix.cuda-version }}${{needs.setup.outputs.image-tag}} --build-arg PYTHON_VERSION=${{ matrix.python-version }} --build-arg PYTORCH_VERSION=${{ matrix.pytorch-version }} --build-arg CUDA_VERSION=${{ matrix.cuda-version }} --build-arg CUDA_ARCH_LIST="${{ matrix.cuda-arch-list }}"
-          docker push torchextensionbuilder/windows:py${{ matrix.python-version }}-pt${{ matrix.pytorch-version }}-cu${{ matrix.cuda-version }}${{needs.setup.outputs.image-tag}}
-          docker logout
+          docker login -u $env:USER -p $env:TOKEN || exit 1
+          docker build ./windows -t $env:USER/windows:py${{ matrix.python-version }}-pt${{ matrix.pytorch-version }}-cu${{ matrix.cuda-version }}${{needs.setup.outputs.image-tag}} --build-arg PYTHON_VERSION=${{ matrix.python-version }} --build-arg PYTORCH_VERSION=${{ matrix.pytorch-version }} --build-arg CUDA_VERSION=${{ matrix.cuda-version }} --build-arg CUDA_ARCH_LIST="${{ matrix.cuda-arch-list }}" || exit 1
+          docker push $env:USER/windows:py${{ matrix.python-version }}-pt${{ matrix.pytorch-version }}-cu${{ matrix.cuda-version }}${{needs.setup.outputs.image-tag}} || exit 1
+          docker logout || exit 1
         env:
           USER: ${{ secrets.DOCKERHUB_USERNAME }}
           TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
