@@ -1,4 +1,5 @@
-FROM mcr.microsoft.com/windows/servercore:10.0.19042.1415
+FROM mcr.microsoft.com/windows/servercore:ltsc2022
+# 10.0.19042.1415
 
 SHELL ["cmd", "/S", "/C"]
 
