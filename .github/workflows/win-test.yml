@@ -48,7 +48,7 @@ jobs:
         run: |
           docker login -u $env:USER -p $env:TOKEN
           docker build ./windows -t windows:py${{ matrix.python-version }}-pt${{ matrix.pytorch-version }}-cu${{ matrix.cuda-version }}${{needs.setup.outputs.image-tag}} --build-arg PYTHON_VERSION=${{ matrix.python-version }} --build-arg PYTORCH_VERSION=${{ matrix.pytorch-version }} --build-arg CUDA_VERSION=${{ matrix.cuda-version }} --build-arg CUDA_ARCH_LIST="${{ matrix.cuda-arch-list }}"
-          docker image push torchextensionbuilder/windows:py${{ matrix.python-version }}-pt${{ matrix.pytorch-version }}-cu${{ matrix.cuda-version }}${{needs.setup.outputs.image-tag}}
+          docker push torchextensionbuilder/windows:py${{ matrix.python-version }}-pt${{ matrix.pytorch-version }}-cu${{ matrix.cuda-version }}${{needs.setup.outputs.image-tag}}
           docker logout
         env:
           USER: ${{ secrets.DOCKERHUB_USERNAME }}
