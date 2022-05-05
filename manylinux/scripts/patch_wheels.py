@@ -37,7 +37,9 @@ def patch_wheel(wheel_path, output_dir="patched_wheels"):
     utils.unpack_wheel(wheel_path)
 
     # Finding libraries and dependancies...
-    wheel_libraries = glob.glob(f"{work_dir}/*.so")
+    wheel_libraries = glob.glob(os.path.join(f"{work_dir}", "**", "*.so"), recursive=True)
+    if not wheel_libraries:
+        print(f"no '.so' library found in {work_dir}.")
     wheel_dependancies = glob.glob(f"{work_dir}/{package_name}.libs/*.so*")
     torch_libraries = glob.glob(os.path.join(os.path.dirname(torch.__file__), "lib", "*.so*"))
 
