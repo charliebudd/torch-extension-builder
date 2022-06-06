@@ -71,6 +71,9 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
+      - name: Get Tags
+        run: git fetch --tags
+
       - name: Build Wheels
         working-directory: ${{ inputs.working-directory }}
         run: ${{ inputs.build-command }}
