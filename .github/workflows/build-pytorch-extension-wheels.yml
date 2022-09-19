@@ -67,6 +67,12 @@ jobs:
             cuda-version: 11.3 
           - python-version: 3.6
             pytorch-version: 1.11
+          - pytorch-version: 1.9
+            cuda-version: 11.6 
+          - pytorch-version: '1.10'
+            cuda-version: 11.6 
+          - pytorch-version: 1.11
+            cuda-version: 11.6 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
