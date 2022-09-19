@@ -14,7 +14,7 @@ on:
         default: "[3.6, 3.7, 3.8, 3.9]"
       pytorch-versions:
         type: string
-        default: "[1.9, '1.10', 1.11]"
+        default: "[1.9, '1.10', 1.11, 1.12]"
       cuda-versions:
         type: string
         default: "[10.2, 11.3]"
