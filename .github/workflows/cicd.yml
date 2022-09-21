@@ -145,6 +145,7 @@ jobs:
         env:
           PYTORCH_VERSION: ${{ matrix.pytorch-version }}
           CUDA_VERSION: ${{ matrix.cuda-version }}
+        shell: bash
 
       - name: Download Cached Wheels
         uses: actions/download-artifact@v3
