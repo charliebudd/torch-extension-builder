@@ -94,9 +94,6 @@ jobs:
     with:
       working-directory: test_extension
       build-command: python setup.py bdist_wheel
-      python-versions: "[3.6, 3.7, 3.8, 3.9]"
-      pytorch-versions: "[1.9, '1.10', 1.11]"
-      cuda-versions: "[10.2, 11.3]"
        
   test-built-package:
     name: Test Built Package
