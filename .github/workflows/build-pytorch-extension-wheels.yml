@@ -17,7 +17,7 @@ on:
         default: "[1.9, '1.10', 1.11, 1.12]"
       cuda-versions:
         type: string
-        default: "[10.2, 11.3]"
+        default: "[10.2, 11.3, 11.6]"
 
 jobs:
   setup:
