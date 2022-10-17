@@ -64,9 +64,11 @@ jobs:
         cuda-version: ${{ fromJson(inputs.cuda-versions) }}
         exclude:
           - pytorch-version: 1.9
-            cuda-version: 11.3 
+            cuda-version: 11.3
           - python-version: 3.6
             pytorch-version: 1.11
+          - python-version: 3.6
+            pytorch-version: 1.12
           - pytorch-version: 1.9
             cuda-version: 11.6 
           - pytorch-version: '1.10'
