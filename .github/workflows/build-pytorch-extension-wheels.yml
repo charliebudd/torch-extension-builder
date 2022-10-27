@@ -81,6 +81,9 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Fetch all history for all tags and branches
+        run: git fetch --prune --unshallow
+
       - name: Build Wheels
         working-directory: ${{ inputs.working-directory }}
         run: ${{ inputs.build-command }}
