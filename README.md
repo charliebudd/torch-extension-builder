@@ -9,7 +9,7 @@ Packages built using Torch Extension Builder currently suppport the following ru
 <img src="https://img.shields.io/badge/Python-3.7%20|%203.8%20|%203.9%20|%203.10%20|%203.11-3776ab.svg"/>
 <br />
 <img src="https://img.shields.io/badge/PyTorch-1.10%20|%201.11%20|%201.12%20|%201.13-EE4C2C.svg"/>
-<img src="https://img.shields.io/badge/CUDA-10.2%20|%2011.1%20|%2011.3%20|%2011.5%20|%2011.6%20|%2011.7-76b900.svg"/>
+<img src="https://img.shields.io/badge/CUDA-10.2%20|%2011.3%20|%2011.6%20|%2011.7-76b900.svg"/>
 <div />
 
 ## Explanation

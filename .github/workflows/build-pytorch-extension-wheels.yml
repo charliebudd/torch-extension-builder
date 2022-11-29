@@ -17,7 +17,7 @@ on:
         default: "['1.10', 1.11, 1.12, 1.13]"
       cuda-versions:
         type: string
-        default: "[10.2, 11.1, 11.3, 11.5, 11.6, 11.7]"
+        default: "[10.2, 11.3, 11.6, 11.7]"
 
 jobs:
   setup:
@@ -68,35 +68,23 @@ jobs:
           - pytorch-version: '1.10'
             python-version: 3.11
           - pytorch-version: '1.10'
-            cuda-version: 11.5
-          - pytorch-version: '1.10'
             cuda-version: 11.6
           - pytorch-version: '1.10'
             cuda-version: 11.7
           - pytorch-version: 1.11
             python-version: 3.11
           - pytorch-version: 1.11
-            cuda-version: 11.1
-          - pytorch-version: 1.11
             cuda-version: 11.6
           - pytorch-version: 1.11
             cuda-version: 11.7
           - pytorch-version: 1.12
             python-version: 3.11
-          - pytorch-version: 1.12
-            cuda-version: 11.1
-          - pytorch-version: 1.12
-            cuda-version: 11.5
           - pytorch-version: 1.12
             cuda-version: 11.7
           - pytorch-version: 1.13
             cuda-version: 10.2
           - pytorch-version: 1.13
-            cuda-version: 11.1
-          - pytorch-version: 1.13
             cuda-version: 11.3
-          - pytorch-version: 1.13
-            cuda-version: 11.5
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3

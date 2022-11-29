@@ -36,25 +36,19 @@ jobs:
       matrix:
         python-version: [3.7, 3.8, 3.9, '3.10', 3.11]
         pytorch-version: ['1.10', 1.11, 1.12, 1.13]
-        cuda-version: [10.2, 11.1, 11.3, 11.5, 11.6, 11.7]
+        cuda-version: [10.2, 11.3, 11.6, 11.7]
         include:
           - cuda-version: 10.2
-            cuda-arch-list: "3.7 5.0 6.0 6.1 6.2 7.0 7.2 7.5+PTX" # archs taken from... https://en.wikipedia.org/wiki/CUDA#GPUs_supported
+            cuda-arch-list: "6.0 6.1 6.2 7.0 7.2 7.5+PTX" # archs taken from... https://en.wikipedia.org/wiki/CUDA#GPUs_supported
             gcc-version: 8 # gcc versions taken from... https://gist.github.com/ax3l/9489132#nvcc
-          - cuda-version: 11.1
-            cuda-arch-list: "3.7 5.0 6.0 6.1 6.2 7.0 7.2 7.5 8.0 8.6+PTX"
-            gcc-version: 10
           - cuda-version: 11.3
-            cuda-arch-list: "3.7 5.0 6.0 6.1 6.2 7.0 7.2 7.5 8.0 8.6+PTX"
+            cuda-arch-list: "6.0 6.1 6.2 7.0 7.2 7.5 8.0 8.6+PTX"
             gcc-version: 10
-          - cuda-version: 11.5
-            cuda-arch-list: "3.7 5.0 6.0 6.1 6.2 7.0 7.2 7.5 8.0 8.6+PTX" # 8.7 "should" work for 11.5 and later but appears not to work
-            gcc-version: 11
           - cuda-version: 11.6
-            cuda-arch-list: "3.7 5.0 6.0 6.1 6.2 7.0 7.2 7.5 8.0 8.6+PTX"
+            cuda-arch-list: "6.0 6.1 6.2 7.0 7.2 7.5 8.0 8.6+PTX" # 8.7 "should" work for 11.5 and later but appears not to work
             gcc-version: 11
           - cuda-version: 11.7
-            cuda-arch-list: "3.7 5.0 6.0 6.1 6.2 7.0 7.2 7.5 8.0 8.6+PTX"
+            cuda-arch-list: "6.0 6.1 6.2 7.0 7.2 7.5 8.0 8.6+PTX"
             gcc-version: 11
         exclude:
           - pytorch-version: '1.10'
@@ -62,35 +56,23 @@ jobs:
           - pytorch-version: '1.10'
             python-version: 3.11
           - pytorch-version: '1.10'
-            cuda-version: 11.5
-          - pytorch-version: '1.10'
             cuda-version: 11.6
           - pytorch-version: '1.10'
             cuda-version: 11.7
           - pytorch-version: 1.11
             python-version: 3.11
           - pytorch-version: 1.11
-            cuda-version: 11.1
-          - pytorch-version: 1.11
             cuda-version: 11.6
           - pytorch-version: 1.11
             cuda-version: 11.7
           - pytorch-version: 1.12
             python-version: 3.11
-          - pytorch-version: 1.12
-            cuda-version: 11.1
-          - pytorch-version: 1.12
-            cuda-version: 11.5
           - pytorch-version: 1.12
             cuda-version: 11.7
           - pytorch-version: 1.13
             cuda-version: 10.2
           - pytorch-version: 1.13
-            cuda-version: 11.1
-          - pytorch-version: 1.13
             cuda-version: 11.3
-          - pytorch-version: 1.13
-            cuda-version: 11.5
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
