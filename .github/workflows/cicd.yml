@@ -35,8 +35,8 @@ jobs:
       fail-fast: false
       matrix:
         python-version: [3.6, 3.7, 3.8, 3.9]
-        pytorch-version: [1.9, '1.10', 1.11]
-        cuda-version: [10.2, 11.3]
+        pytorch-version: [1.9, '1.10', 1.11, 1.12]
+        cuda-version: [10.2, 11.3, 11.6]
         include:
           - cuda-version: 10.2
             cuda-arch-list: "3.7 5.0 6.0 6.1 6.2 7.0 7.2 7.5+PTX"
@@ -44,11 +44,22 @@ jobs:
           - cuda-version: 11.3
             cuda-arch-list: "3.7 5.0 6.0 6.1 6.2 7.0 7.2 7.5 8.0 8.6+PTX"
             gcc-version: 10
+          - cuda-version: 11.6
+            cuda-arch-list: "3.7 5.0 6.0 6.1 6.2 7.0 7.2 7.5 8.0 8.6+PTX"
+            gcc-version: 10
         exclude:
-          - pytorch-version: 1.9
-            cuda-version: 11.3 
           - python-version: 3.6
             pytorch-version: 1.11
+          - python-version: 3.6
+            pytorch-version: 1.12
+          - pytorch-version: 1.9
+            cuda-version: 11.3
+          - pytorch-version: 1.9
+            cuda-version: 11.6 
+          - pytorch-version: '1.10'
+            cuda-version: 11.6 
+          - pytorch-version: 1.11
+            cuda-version: 11.6 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -83,9 +94,6 @@ jobs:
     with:
       working-directory: test_extension
       build-command: python setup.py bdist_wheel
-      python-versions: "[3.6, 3.7, 3.8, 3.9]"
-      pytorch-versions: "[1.9, '1.10', 1.11]"
-      cuda-versions: "[10.2, 11.3]"
        
   test-built-package:
     name: Test Built Package
@@ -95,13 +103,21 @@ jobs:
       fail-fast: false
       matrix:
         python-version: [3.6, 3.7, 3.8, 3.9]
-        pytorch-version: [1.9, '1.10', 1.11]
-        cuda-version: [10.2, 11.3]
+        pytorch-version: [1.9, '1.10', 1.11, 1.12]
+        cuda-version: [10.2, 11.3, 11.6]
         exclude:
-          - pytorch-version: 1.9
-            cuda-version: 11.3 
           - python-version: 3.6
             pytorch-version: 1.11
+          - python-version: 3.6
+            pytorch-version: 1.12
+          - pytorch-version: 1.9
+            cuda-version: 11.3
+          - pytorch-version: 1.9
+            cuda-version: 11.6 
+          - pytorch-version: '1.10'
+            cuda-version: 11.6 
+          - pytorch-version: 1.11
+            cuda-version: 11.6 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
@@ -120,6 +136,7 @@ jobs:
         env:
           PYTORCH_VERSION: ${{ matrix.pytorch-version }}
           CUDA_VERSION: ${{ matrix.cuda-version }}
+        shell: bash
 
       - name: Download Cached Wheels
         uses: actions/download-artifact@v3

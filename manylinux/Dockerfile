@@ -65,6 +65,7 @@ ENV CUDA_VERSION "${CUDA_VERSION}"
 ENV TORCH_CUDA_ARCH_LIST "${CUDA_ARCH_LIST}"
 ENV TORCH_LIBRARY_PATH "/opt/_internal/cpython-${PYTHON_VERSION}/lib/python${PYTHON_VERSION}/site-packages/torch/lib"
 ENV LD_LIBRARY_PATH "${TORCH_LIBRARY_PATH}:$LD_LIBRARY_PATH"
+ENV TORCH_DONT_CHECK_COMPILER_ABI "1"
 
 #===================================
 # Adding scripts...
