@@ -14,14 +14,18 @@ jobs:
         cuda-version: [10.2, 11.3, 11.6]
         include:
           - cuda-version: 10.2
+            cuda-minor-version: 89 #https://developer.download.nvidia.com/compute/cuda/10.2/Prod/network_installers/cuda_10.2.89_win10_network.exe
             cuda-arch-list: "3.7 5.0 6.0 6.1 6.2 7.0 7.2 7.5+PTX"
             gcc-version: 8
           - cuda-version: 11.3
+            cuda-minor-version: 0 #https://developer.download.nvidia.com/compute/cuda/11.3.0/network_installers/cuda_11.3.0_win10_network.exe
             cuda-arch-list: "3.7 5.0 6.0 6.1 6.2 7.0 7.2 7.5 8.0 8.6+PTX"
             gcc-version: 10
           - cuda-version: 11.6
+            cuda-minor-version: 0 #https://developer.download.nvidia.com/compute/cuda/11.6.0/network_installers/cuda_11.6.0_windows_network.exe
             cuda-arch-list: "3.7 5.0 6.0 6.1 6.2 7.0 7.2 7.5 8.0 8.6+PTX"
             gcc-version: 10
+          
         exclude:
           - python-version: 3.6
             pytorch-version: 1.11
@@ -37,14 +41,28 @@ jobs:
             cuda-version: 11.6 
     steps:
       - name: Install Python
-        run: install-python.bat
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install MSVC
+        uses: ilammy/msvc-dev-cmd@v1
 
       - name: Install Cuda
-        run: install-cuda.bat
+        uses: Jimver/cuda-toolkit@v0.2.8
+        id: cuda-toolkit
+        with:
+          cuda: '${{ matrix.cuda-version }}.${{ matrix.cuda-minor-version }}'
+
+      - name: Install Pytorch
+        run: |
+          FULL_PYTORCH_VERSION=$(python -m pip index versions torch -f https://download.pytorch.org/whl/torch_stable.html | grep -o ${PYTORCH_VERSION}.[0-9]+cu${CUDA_VERSION//.} | head -n 1); \
+          python -m pip install torch==${FULL_PYTORCH_VERSION} -f https://download.pytorch.org/whl/torch_stable.html;
+          python -m pip install numpy wheel ninja
 
       - name: Checkout Repository
         uses: actions/checkout@v2
 
       - name: Build Wheels
-        working-directory: test_extention
+        working-directory: test_extension
         run: python setup.py install
