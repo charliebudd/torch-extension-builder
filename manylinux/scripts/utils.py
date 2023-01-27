@@ -1,9 +1,9 @@
 import subprocess
 
 def get_ptcu_code():
-    from torch import __version__
+    from torch.version import __version__, cuda
     torch_version = "".join(__version__.split(".")[:2])
-    cuda_version = __version__.split("+cu")[-1]
+    cuda_version = "".join(cuda.split("+cu")[-1].split("."))
     return "pt" + torch_version + "cu" + cuda_version
 
 def unpack_wheel(wheel_path, directory=None):
