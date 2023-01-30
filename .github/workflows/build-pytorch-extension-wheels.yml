@@ -45,9 +45,9 @@ jobs:
           echo "Tag: $TAG"
 
           if [[ $TAG == main ]] || [[ $TAG =~ v[0-9] ]]; then
-              echo "::set-output name=image-tag::-$TAG"
+              echo "image-tag=-$TAG" >> $GITHUB_OUTPUT
           else
-              echo "::set-output name=image-tag::"
+              echo "image-tag=" >> $GITHUB_OUTPUT
           fi
 
   build-wheels:
